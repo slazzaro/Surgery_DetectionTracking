@@ -1,140 +1,28 @@
-function [ gradientImages ] = readAndFilterVideo(name, filterVal, frameToFilter, shouldShowDark)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
-
-
-%opticalFlow = vision.OpticalFlow
+function [ gradientImages ] = readAndFilterVideo(name, centroids)
+%   Function: readAndFilterVideo
+%   Author : Stephen Lazzaro
+%   Description: Takes the input centroids and places them in the
+%   appropriate frame.  Then, uses optical flow (with a texture filter) in
+%   order to track and move the centroid i.e. track the important object.
+%   Optical flow is used to find an image of gradients for all of the
+%   pixels in a particular frame, and then the gradient at the pixel where
+%   each centroid is located is used to shift the centroid, hence tracking
+%   an object.
+%
+%   PARAMETERS:
+%       name: name of the video file
+%       centroids: n x 3 matrix where n is the number of centroids that the
+%           user wants to be tracked.  The first column is the row of the centroid,
+%           the second is its column, and the third is the frame where the centroid
+%           should appear.  The order of the centroids should be from earliest
+%           frame to latest frame
 
 vidObj = VideoReader(name);
-% veins = rgb2gray(read(vidObj,frameToFilter));
-% 
-% %veins = edge(veins, 'canny'); %good ones are canny, log and zerocross
-% veins = rangefilt(veins); %texture filter
-% figure, imshow(veins)
-% 
-% if shouldShowDark == 1
-%     noDarkObjs = imextendedmin(veins,filterVal);
-% else
-%     noDarkObjs = imextendedmax(veins,filterVal);
-% end
-% 
-% figure, imshow(noDarkObjs)
-% sedisk = strel('disk',2);
-% noSmallStructures = imopen(noDarkObjs, sedisk);
-% imshow(noSmallStructures)
 
-
-%this code based on 
-% http://www.mathworks.com/help/images/examples/detecting-cars-in-a-video-of-traffic.html
-% http://www.mathworks.com/matlabcentral/newsreader/view_thread/300675
-
-nframes = get(vidObj, 'NumberOfFrames');
-% I = read(vidObj, 1);
-% %NOTE MUST BE DONE IN BATCHES SO MATLAB DOESN'T RUN OUT OF MEMORY
-% batchDivider = 50;
-% sedisk = strel('disk',5);
-% for i = 1:batchDivider
-%     start = ceil( (i - 1) * nframes/batchDivider);
-%     finish = ceil( i * nframes / batchDivider);
-%     theSize = ceil(nframes / batchDivider);
-%     taggedObjs = zeros([vidObj.Height vidObj.Width 3 theSize], class(I));
-%     display(strcat('INFO ---- starting at frame:', num2str(start)));
-%     for k = start : finish
-%         singleFrame = read(vidObj, k + 1);
-%         
-%         % Convert to grayscale to do morphological processing.
-%         I = rgb2gray(singleFrame);
-%         
-%         % Remove dark cars.
-%         if shouldShowDark == 1
-%             noDarkObjs = imextendedmin(I,filterVal);
-%         else
-%             noDarkObjs = imextendedmax(I,filterVal);
-%         end
-%         
-%         % Remove lane markings and other non-disk shaped structures.
-%         noSmallStructures = imopen(noDarkObjs, sedisk);
-%         
-%         % Remove small structures.
-%         noSmallStructures = bwareaopen(noSmallStructures, 100);
-%         
-%         % Get the area and centroid of each remaining object in the frame. The
-%         % object with the largest area is the light-colored car.  Create a copy
-%         % of the original frame and tag the car by changing the centroid pixel
-%         % value to red.
-%         index = k - start + 1;
-%    
-%         taggedObjs(:,:,:,index) = singleFrame;
-%         
-%         %allow this when using bounding box
-% %         taggedObjs2(:,:,:,index) = singleFrame;
-% %         I = taggedObjs2(:,:,:,index);
-%         
-%         stats = regionprops(noSmallStructures, {'Area','Centroid', 'BoundingBox'});
-%         if ~isempty([stats.Area])
-%             areaArray = [stats.Area];
-%             [junk,idx] = max(areaArray);
-%              
-%              %Allow this for centroid to be displayed
-%             c = stats(idx).Centroid;
-%             display(c);
-%             c = floor(fliplr(c));
-%             display(c);
-%             width = 2;
-%             row = c(1)-width:c(1)+width;
-%             col = c(2)-width:c(2)+width;
-%             taggedObjs(row,col,1,index) = 255;
-%             taggedObjs(row,col,2,index) = 0;
-%             taggedObjs(row,col,3,index) = 0;
-%             
-%             %% BOUNDING BOX rectangle drawing
-% %             bb = stats(idx).BoundingBox;
-% %             bb = floor(bb);
-% %             firstTerm = max(bb(2),1);
-% %             secondTerm = max(bb(1),1);
-% %             BBimg = false(bb([4 3]));
-% %             BBimg(:, [1 end]) = true;
-% %             BBimg([1 end],:) = true;
-% %             %taggedObjs(bb(2):(bb(2)+bb(4)),bb(1):(bb(1)+bb(3)),1,k) = double(BBimg).*255;
-% %             taggedObjs(firstTerm:(bb(2)+bb(4)),secondTerm:(bb(1)+bb(3)),1,index) = 255;
-% %             taggedObjs(firstTerm:(bb(2)+bb(4)),secondTerm:(bb(1)+bb(3)),2,index) = 165;
-% %             taggedObjs(firstTerm:(bb(2)+bb(4)),secondTerm:(bb(1)+bb(3)),3,index) = 0;
-%             
-%             %% BOUNDING BOX drawing
-% %             bb = stats(idx).BoundingBox;
-% %             bb = floor(bb);
-% %             if (bb(1) == 0)
-% %                 bb(1) = 1;
-% %             end
-% %             if (bb(2) == 0)
-% %                 bb(2) = 1;
-% %             end
-% %             BBimg = false(bb([4 3]));
-% %             BBimg(:, [1 end]) = true;
-% %             BBimg([1 end],:) = true;
-% %             M = false(size(I,1),size(I,2));
-% %             M(bb(2):bb(2)+bb(4)+1,[bb(1), bb(1)+bb(3)+1]) = true;
-% %             M([bb(2),bb(2)+bb(4)+1],bb(1):bb(1)+bb(3)+1) = true;
-% %             idx = find(M);
-% %             nM = numel(M);
-% %             I(idx) = 255;
-% %             I(idx+nM) = 165;
-% %             I(idx+nM*2) = 0;
-% %             taggedObjs2(:,:,:,index) = I;
-%             
-%         end
-%     end
-%     
-%     frameRate = get(vidObj,'FrameRate');
-%     implay(taggedObjs,frameRate);
-% end
-
-
-%optical flow code...default is Horn-Schunck...can also be adapted to work
-%with a live feed
+%optical flow code...default is Horn-Schunck...can also be adapted to work with a live feed
 % http://www.mathworks.com/help/imaq/examples/live-motion-detection-using-optical-flow.html
 optical = vision.OpticalFlow( ...
-    'OutputValue', 'Horizontal and vertical components in complex form', ...
+'OutputValue', 'Horizontal and vertical components in complex form', ...
     'ReferenceFrameSource', 'Input Port');
 
 hVideoIn = vision.VideoPlayer;
@@ -153,40 +41,92 @@ r = 1:5:maxHeight;
 c = 1:5:maxWidth;
 [Y, X] = meshgrid(c,r);
 
-% Set up for stream
-frame = 1;
 %NOTE: SHOULD GO TO UP TO NUM OF FRAMES - 1
+frame = 1;
 rgbData = read(vidObj, frame);
-while (frame<200)     % Process for the first 100 frames.
-    % Acquire single frame from imaging device.
-    rgbData2 = read(vidObj, frame + 1);
-
-    % Compute the optical flow for that particular frame.
-    optFlow = step(optical, double(rgb2gray(rgbData2)), double(rgb2gray(rgbData)));
-
-    % Downsample optical flow field.
-    optFlow_DS = optFlow(r, c);
-    H = imag(optFlow_DS)*50;
-    V = real(optFlow_DS)*50;
-
-    % Draw lines on top of image
-    lines = [Y(:)'; X(:)'; Y(:)'+V(:)'; X(:)'+H(:)'];
-    rgb_Out = step(shapes, double(rgb2gray(rgbData2)),  lines');
-
-    % Send image data to video player
-    % Display original video.
-    step(hVideoIn, rgbData);
-    
-    % Display video along with motion vectors.
-    step(hVideoOut, rgb_Out);
-
-    % Increment frame count
-    frame = frame + 1;
-    rgbData = rgbData2; %do this so you don't have to read each file on two iterations
+nframes = vidObj.NumberOfFrames;
+batchDivider = 50;
+numCentroidsShowing = 0;
+numCentroidsUnused = size(centroids,1);
+for i = 1:batchDivider
+    start = ceil( (i - 1) * nframes/batchDivider);
+    finish = ceil( i * (nframes - 1) / batchDivider);
+    theSize = ceil(nframes / batchDivider);
+    gradientImages = zeros(maxHeight, maxWidth, 3, theSize);
+    for k = start:finish
+        % First check if new centroids should be added to frame
+        % NOTE: centroids should be in order from earliest to latest frame
+        if (numCentroidsUnused ~= 0)
+            for index = 1:size(centroids,1)
+                if numCentroidsUnused == 0 %need this case for after the last centroid is removed
+                    break;
+                end
+                currCentroid = centroids(index,:);
+                if (currCentroid(3) == frame)
+                    numCentroidsShowing = numCentroidsShowing + 1;
+                    numCentroidsUnused = numCentroidsUnused - 1;
+                    centroidsShowing(numCentroidsShowing,:) = currCentroid;
+                else
+                    centroids = centroids(index:size(centroids,1),:);
+                    break;
+                end
+            end
+        end
+        
+        % Acquire single frame
+        rgbData2 = read(vidObj, frame + 1);
+        gray1 = rgb2gray(rgbData);
+        gray2 = rgb2gray(rgbData2);
+        
+        % Compute the optical flow for that particular frame...use texture
+        % filter beforehand
+        optFlow = step(optical, double(rangefilt(gray2)), double(rangefilt(gray1)));
+        
+        % Downsample optical flow field.
+        optFlow_DS = optFlow(r, c);
+        H = imag(optFlow_DS)*50;
+        V = real(optFlow_DS)*50;
+        
+        % Draw lines on top of image
+        %lines = [Y(:)'; X(:)'; Y(:)'+V(:)'; X(:)'+H(:)'];
+        %rgb_Out = step(shapes, double(rangefilt(gray2)),  lines');
+        
+        %Allow this for centroid to be displayed
+        if (numCentroidsShowing ~= 0)
+            for q = 1:size(centroidsShowing,1)
+                %c = floor(fliplr(c));
+                %display(c);
+                c = centroidsShowing(q,:);
+                c = floor(c);
+                width = 2;
+                row = c(1)-width:c(1)+width;
+                col = c(2)-width:c(2)+width;
+                rgbData(row,col,1) = 255;
+                rgbData(row,col,2) = 0;
+                rgbData(row,col,3) = 0;
+            end
+        end
+        
+        % Send image data to video player
+        % Display original video with centroids added
+        step(hVideoIn, rgbData);
+        
+        % Display video along with motion vectors.
+        %step(hVideoOut, rgb_Out);
+        
+        % Increment frame count
+        rgbData = rgbData2; %do this so you don't have to read each file on two iterations
+        frame = frame + 1;
+        
+        %TODO: Finally, shift each of centroidsShowing based on optical
+        %flow field.  Note: if the centroid has any coordinate out of
+        %bounds then remove it from the centroidsShowingArray and decrement
+        %the numCentroidsShowing count
+    end
 end
 
-    %frameRate = get(vidObj,'FrameRate');
-    %implay(taggedObjs,frameRate);
+%frameRate = get(vidObj,'FrameRate');
+%implay(taggedObjs,frameRate);
 
 
 % http://www.mathworks.com/products/computer-vision/code-examples.html;jsessionid=388379f445f6563bd4c454e94d72?file=/products/demos/shipping/vision/videotrafficof.html
