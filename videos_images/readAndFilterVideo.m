@@ -15,12 +15,15 @@ function [ gradientImages ] = readAndFilterVideo(name, centroids)
 %           user wants to be tracked.  The first column is the row of the centroid,
 %           the second is its column, and the third is the frame where the centroid
 %           should appear.  The order of the centroids should be from earliest
-%           frame to latest frame
+%           frame to latest frame.  NOTE: the centroids must be within
+%           2 pixels of the bounds of the video
 
 vidObj = VideoReader(name);
 
 %optical flow code...default is Horn-Schunck...can also be adapted to work with a live feed
-% http://www.mathworks.com/help/imaq/examples/live-motion-detection-using-optical-flow.html
+% the Horizontal component as the real part of the result, and the vertical 
+% component as the complex part of the result.
+% based off http://www.mathworks.com/help/imaq/examples/live-motion-detection-using-optical-flow.html
 optical = vision.OpticalFlow( ...
 'OutputValue', 'Horizontal and vertical components in complex form', ...
     'ReferenceFrameSource', 'Input Port');
@@ -118,10 +121,32 @@ for i = 1:batchDivider
         rgbData = rgbData2; %do this so you don't have to read each file on two iterations
         frame = frame + 1;
         
-        %TODO: Finally, shift each of centroidsShowing based on optical
+        % Finally, shift each of centroidsShowing based on optical
         %flow field.  Note: if the centroid has any coordinate out of
         %bounds then remove it from the centroidsShowingArray and decrement
         %the numCentroidsShowing count
+        if numCentroidsShowing ~= 0
+            numOfRowsToBeRemoved = 0;
+            for q = 1:size(centroidsShowing,1)
+                c = centroidsShowing(q,:);
+                complexNum = optFlow(floor(c(1)), floor(c(2)));
+                horizComp = real(complexNum);
+                verticalComp = imag(complexNum);
+                centroidsShowing(q,1) = c(1) + horizComp;
+                centroidsShowing(q,2) = c(2) + verticalComp;
+                %now check if any of the centroids are out of the views
+                %bounds.  If so, then add it to the list of rows that will
+                %be removed
+                if (centroidsShowing(q,1) < 1) || (centroidsShowing(q,1) > maxHeight) || ...
+                    (centroidsShowing(q,2) < 1) || (centroidsShowing(q,2) > maxWidth)
+                    numOfRowsToBeRemoved = numOfRowsToBeRemoved + 1;
+                    rowsToRemove(numOfRowsToBeRemoved) = q;
+                end
+            end
+            if numOfRowsToBeRemoved ~= 0
+                centroidsShowing = removerows(centroidsShowing, 'ind', rowsToRemove);
+            end
+        end
     end
 end
 
