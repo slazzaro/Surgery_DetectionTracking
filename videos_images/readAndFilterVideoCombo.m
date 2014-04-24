@@ -73,7 +73,8 @@ for i = 1:batchDivider
                 if (currCentroid(3) == frame)
                     numCentroidsShowing = numCentroidsShowing + 1;
                     numCentroidsUnused = numCentroidsUnused - 1;
-                    centroidsShowing(numCentroidsShowing,:) = currCentroid;
+                    centroidsShowing(numCentroidsShowing,1) = currCentroid(1);
+                    centroidsShowing(numCentroidsShowing,2) = currCentroid(2);
                     %store the original color as well
                     centroidsShowing(numCentroidsShowing,3) = rgbData(currCentroid(1),currCentroid(2),1);
                     centroidsShowing(numCentroidsShowing,4) = rgbData(currCentroid(1),currCentroid(2),2);

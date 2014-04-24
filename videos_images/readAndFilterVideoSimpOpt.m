@@ -129,9 +129,8 @@ for i = 1:batchDivider
         if numCentroidsShowing ~= 0
 %             gray1 = rgb2gray(rOrig);
 %             gray2 = rgb2gray(rgbData2);
-%             newCentroids = calcSimpleOpticalFlow(centroidsShowing, gray2, gray1, 35);
-            newCentroids = calcSimpleOpticalFlow(centroidsShowing, rgbData2, rOrig, 85, 1000, 3, 1);
-            %newCentroids
+%             newCentroids = calcSimpleOpticalFlow(centroidsShowing, gray2, gray1, 85, 1000, 3, 0);
+            newCentroids = calcSimpleOpticalFlow(centroidsShowing, rgbData2, rOrig, 85, 1000, 3.6, 1);
             numOfRowsToBeRemoved = 0;
             for q = 1:size(centroidsShowing,1)
                 if (newCentroids(q,1) == 0)
