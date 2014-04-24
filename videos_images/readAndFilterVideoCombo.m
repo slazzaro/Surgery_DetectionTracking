@@ -138,6 +138,7 @@ for i = 1:batchDivider
         %flow field.  Note: if the centroid has any coordinate out of
         %bounds then remove it from the centroidsShowingArray and decrement
         %the numCentroidsShowing count
+        %TODO: TEST BY COMBINING WITH SIMPLEOPTICAL FLOW HERE ALSO
         if numCentroidsShowing ~= 0
             numOfRowsToBeRemoved = 0;
             for q = 1:size(centroidsShowing,1)

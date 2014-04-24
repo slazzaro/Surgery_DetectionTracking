@@ -1,13 +1,16 @@
-function [ gradientImages ] = readAndFilterVideo(name, centroids)
+function [ gradientImages ] = readAndFilterVideoSimpOpt(name, centroids)
 %   Function: readAndFilterVideo
 %   Author : Stephen Lazzaro
 %   Description: Takes the input centroids and places them in the
-%   appropriate frame.  Then, uses optical flow (with a texture filter) in
-%   order to track and move the centroid i.e. track the important object.
-%   Optical flow is used to find an image of gradients for all of the
-%   pixels in a particular frame, and then the gradient at the pixel where
-%   each centroid is located is used to shift the centroid, hence tracking
-%   an object.
+%   appropriate frame.  Then, uses a simpler optical flow type idea to
+%   track the centroid in future frames. In short, for each centroid that
+%   is shown, an n x n neighborhood is looked at for that pixel in the
+%   next frame and the pixel with the shortest distance in rgb value from
+%   the original centroid rgb value becomes the new centroid.  A penalty is
+%   enforced for being farther away in the neighborhood.  Additionally, if
+%   the distance in color from all neighbors is above a certain threshold,
+%   then it is concluded that the centroid of interest has disappeared from
+%   view and tracker for it is removed.
 %
 %   PARAMETERS:
 %       name: name of the video file
@@ -49,6 +52,7 @@ c = 1:5:maxWidth;
 %frame = 4769;
 %for i = 18:batchDivider
 %pix3 = [416 321 4984; 411 431 5157];
+%pixSurg = [273 592 164]
 frame = 1;
 rgbData = read(vidObj, frame);
 nframes = vidObj.NumberOfFrames;
@@ -73,7 +77,8 @@ for i = 1:batchDivider
                 if (currCentroid(3) == frame)
                     numCentroidsShowing = numCentroidsShowing + 1;
                     numCentroidsUnused = numCentroidsUnused - 1;
-                    centroidsShowing(numCentroidsShowing,:) = currCentroid;
+                    centroidsShowing(numCentroidsShowing,1) = currCentroid(1);
+                    centroidsShowing(numCentroidsShowing,2) = currCentroid(2);
                     %store the original color as well
                     centroidsShowing(numCentroidsShowing,3) = rgbData(currCentroid(1),currCentroid(2),1);
                     centroidsShowing(numCentroidsShowing,4) = rgbData(currCentroid(1),currCentroid(2),2);
@@ -87,23 +92,6 @@ for i = 1:batchDivider
         
         % Acquire single frame
         rgbData2 = read(vidObj, min(frame + 1, nframes));
-        gray1 = rgb2gray(rgbData);
-        gray2 = rgb2gray(rgbData2);
-        
-        % Compute the optical flow for that particular frame...the first
-        % line uses a texture filter beforehand, the second does not
-        %optFlow = step(optical, double(rangefilt(gray2)), double(rangefilt(gray1)));
-        optFlow = step(optical, double(gray2), double(gray1));
-        
-%         % Downsample optical flow field.
-%         optFlow_DS = optFlow(r, c);
-%         H = imag(optFlow_DS)*50;
-%         V = real(optFlow_DS)*50;
-%         
-%         % Draw lines on top of image
-%         %lines = [Y(:)'; X(:)'; Y(:)'+V(:)'; X(:)'+H(:)'];
-%         lines = [Y(:)'; X(:)'; Y(:)'; X(:)'];
-%         rgb_Out = step(shapes, double(rangefilt(gray2)),  lines');
         
         %Allow this for centroid to be displayed
         rOrig = rgbData;
@@ -139,21 +127,19 @@ for i = 1:batchDivider
         %bounds then remove it from the centroidsShowingArray and decrement
         %the numCentroidsShowing count
         if numCentroidsShowing ~= 0
+%             gray1 = rgb2gray(rOrig);
+%             gray2 = rgb2gray(rgbData2);
+%             newCentroids = calcSimpleOpticalFlow(centroidsShowing, gray2, gray1, 35);
+            newCentroids = calcSimpleOpticalFlow(centroidsShowing, rgbData2, rOrig, 85, 1000, 3, 1);
+            %newCentroids
             numOfRowsToBeRemoved = 0;
             for q = 1:size(centroidsShowing,1)
-                c = centroidsShowing(q,:);
-                complexNum = optFlow(floor(c(1)), floor(c(2)));
-                horizComp = real(complexNum);
-                verticalComp = imag(complexNum);
-                centroidsShowing(q,1) = c(1) + verticalComp;
-                centroidsShowing(q,2) = c(2) + horizComp;
-                %now check if any of the centroids are out of the views
-                %bounds.  If so, then add it to the list of rows that will
-                %be removed
-                if (centroidsShowing(q,1) < 1) || (centroidsShowing(q,1) > maxHeight) || ...
-                    (centroidsShowing(q,2) < 1) || (centroidsShowing(q,2) > maxWidth)
+                if (newCentroids(q,1) == 0)
                     numOfRowsToBeRemoved = numOfRowsToBeRemoved + 1;
                     rowsToRemove(numOfRowsToBeRemoved) = q;
+                else
+                   centroidsShowing(q,1) = newCentroids(q,1);
+                   centroidsShowing(q,2) = newCentroids(q,2);
                 end
             end
             if numOfRowsToBeRemoved ~= 0
