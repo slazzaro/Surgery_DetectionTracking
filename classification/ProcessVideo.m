@@ -67,6 +67,7 @@ for i = 1:batchDivider
                 currHist = currFrameHist(Y,X,:,:); %third dimension is bins, 4th is the 3 colors
                 %currHist may need to be reshaped here?
                 score = Score1D(currHist, trainingHistograms);
+                display(score);
                 if score > maxScore
                     maxScore = score;
                     maxX = X;

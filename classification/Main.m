@@ -13,7 +13,6 @@ function [ out, trainingHistograms ] = Main( trainDir, videoPath )
     subFolders=[dirContents(:).isdir]; % just subfolder
     folderNames = {dirContents(subFolders).name};    %subfolder names
     folderNames(ismember(folderNames,{'.','..'})) = []; %remove
-    folderNames
     imgFiles = dir(strcat(trainDir, '/', folderNames{1}, '/', '*.jpg')); 
     
     
