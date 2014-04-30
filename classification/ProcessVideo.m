@@ -107,6 +107,8 @@ for i = 1:batchDivider
         % Display original video with centroids added
         step(hVideoIn, rgbData);
         
+        gray_Out = ceil(gray_Out);
+        gray_Out = uint8(gray_Out);
         % Display video with gray scale confidence
         step(hVideoOut, gray_Out);
         
