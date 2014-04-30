@@ -9,12 +9,12 @@ for i=1:3
     for x=1:n
         for y=1:m
             hue = image(y,x,i);
-            bin = floor(hue/w)+1;
+            bin = (hue + 1)/w; %note bc we are dealing with pixel vals matlab rounds up
             out(bin,i) = out(bin,i) + 1;
         end
     end
 end
 
-out = out/n*m;
+out = out/(n*m);
 
 end

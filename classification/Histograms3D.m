@@ -12,7 +12,8 @@ for X=1:N %X will control the x-coordinate of the central pixel
         for x=max(1,X-n):min(N,X+n)
             for y=max(1,Y-n):min(M,Y+n)
                 hue = image(y,x,:);
-                bin = floor(hue./w)+1;
+                %bin = floor(hue./w)+1;
+                bin = (hue./w) +1;
                 out(Y,X,bin(1),bin(2),bin(3)) = out(Y,X,bin(1),bin(2),bin(3)) + 1;
                 temp = temp+1;
             end
