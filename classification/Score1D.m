@@ -4,7 +4,7 @@ function [ out ] = Score1D( hist, train )
 
 out = 0;
 
-for i=1:q
+for i=1:size(train,3)
     out = out + exp(-(Distance1D(hist, train(:,:,i)))^2/2);  %May have to reshape train....
 end
 

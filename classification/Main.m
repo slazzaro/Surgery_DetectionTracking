@@ -15,7 +15,7 @@ function [ out ] = Main( trainDir, videoPath )
     imgFiles = dir(strcat(trainDir, '/', '*.jpg')); 
     
     
-    trainImgCount=0;
+    %trainImgCount=0;
     trainingHistograms = zeros( 256/widthOfBins, 3, length(imgFiles) );
     
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing training images'));
