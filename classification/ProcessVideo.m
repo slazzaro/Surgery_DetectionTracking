@@ -9,8 +9,8 @@ threshold = size(trainingHistograms,3) / 10;
 windowSize = 10;
 
 %create video to be outputed
-vidOut = VideoWriter(strcat('../grayvid_window', num2str(windowSize),'_binwidth', num2str(widthOfBins)));
-vidOut.FrameRate = vidObj.FrameRate;
+%vidOut = VideoWriter(strcat('../grayvid_window', num2str(windowSize),'_binwidth', num2str(widthOfBins)));
+%vidOut.FrameRate = vidObj.FrameRate;
 
 hVideoIn = vision.VideoPlayer;
 hVideoIn.Name  = 'Detection Video';
@@ -112,7 +112,7 @@ for i = 1:batchDivider
         % Display video with gray scale confidence
         step(hVideoOut, gray_Out);
         
-        writeVideo(vidOut, gray_Out);
+        %writeVideo(vidOut, gray_Out);
         
         % Increment frame count
         rgbData = rgbData2; %do this so you don't have to read each file on two iterations
@@ -120,7 +120,7 @@ for i = 1:batchDivider
     end
 end
 
-close(vidOut);
+%close(vidOut);
 
 %    outDir=strcat(trainDir,'/videoUpdated');
 %    mkdir(outDir);

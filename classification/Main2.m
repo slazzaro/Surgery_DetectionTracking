@@ -30,7 +30,6 @@ function [] = Main2( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh,
     open(vidOut);
     for q = 1:divider
         start = (q - 1) * batchSize;
-        finish = min( q * batchSize, video.NumberOfFrames);
         
         vidAll = zeros(video.Height, video.Width, 3, batchSize);
         %for i =1:framesToSee
