@@ -17,6 +17,6 @@ function [] = MainRealTime( trainDir, videoPath, vidOutputName, s, widthOfBins, 
     
     %TO PROCESS AND SHOW LIVE...HAS INTERFACE FOR TRACKING TO BE ADDED
     numObjectsToDetect = 1;
-    ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjectsToDetect ) 
-
+    ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjectsToDetect );
+    
 end
