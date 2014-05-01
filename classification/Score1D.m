@@ -3,8 +3,8 @@ function [ out ] = Score1D( hist, train )
 %  to each image histogram and inversely weighting distance.
 
 out = 0;
-
-for i=1:size(train,3)
+q = length(train(1,1,:));
+for i=1:q
     out = out + exp(-(Distance1D(hist, train(:,:,i)))^2/2);  %May have to reshape train....
 end
 
