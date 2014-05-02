@@ -13,7 +13,7 @@ hVideoIn.Name  = 'Original Video';
 hVideoOut = vision.VideoPlayer;
 hVideoOut.Name  = 'Recognition Video';
 
-batchSize = 20;
+batchSize = 10;
 divider = floor(video.NumberOfFrames / batchSize);
 
 %object which will keep track of the current circles on screen.  First

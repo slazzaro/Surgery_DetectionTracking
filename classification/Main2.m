@@ -9,6 +9,9 @@ function [] = Main2( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh,
 %MAIN2 includes outlines of the object or grids on the object controlled
 %inside OutlineRegion.m (look for the commented line)
     
+    vidOutputName = strcat(vidOutputName,'_s',num2str(s),'_binwidth', ...
+    num2str(widthOfBins),'_thresh',num2str(abs(thresh)),'_skip',num2str(skip));
+
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing training images...'));
     trainingHistograms = BuildTrainingHistograms(trainDir, widthOfBins);
     

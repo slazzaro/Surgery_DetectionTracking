@@ -1,15 +1,14 @@
-function [ bestThresh ] = ThresholdSelection(  trainDir, videoPath, s, widthOfBins, thresh, p)
+function [ bestThresh ] = ThresholdSelection(  trainDir, image, s, widthOfBins, thresh, p)
 %This function is used for selecting the optimal threshold by comparing the
 %fraction of the non-thresholded content which lies in the principal
-%component.  The variable "p" should represent the fraction of the first
-%frame of the video that contains the desired object... example: p=0.04.
+% component.  The variable "p" should represent the fraction of the image
+% inputed that contains the desired object... example: p=0.04.
 
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing training images...'));
     trainingHistograms = BuildTrainingHistograms(trainDir, widthOfBins);
     
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading image...'));
-    video = VideoReader(videoPath);
-    image = double(read(video,1));
+    image = double(image);
     bestThresh = 0;
     bestRatio = 0;
     for t = thresh

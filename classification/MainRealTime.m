@@ -16,6 +16,7 @@ function [] = MainRealTime( trainDir, videoPath, vidOutputName, s, widthOfBins, 
     video = VideoReader(videoPath);
     
     %TO PROCESS AND SHOW LIVE...HAS INTERFACE FOR TRACKING TO BE ADDED
+    display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing video...'));
     numObjectsToDetect = 1;
     ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjectsToDetect );
     
