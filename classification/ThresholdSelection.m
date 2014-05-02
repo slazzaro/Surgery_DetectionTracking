@@ -1,4 +1,4 @@
-function [ bestThresh ] = ThresholdSelection(  trainDir, videoPath, n, s, widthOfBins, thresh, p)
+function [ bestThresh ] = ThresholdSelection(  trainDir, videoPath, s, widthOfBins, thresh, p)
 %This function is used for selecting the optimal threshold by comparing the
 %fraction of the non-thresholded content which lies in the principal
 %component.  The variable "p" should represent the fraction of the first
@@ -15,7 +15,7 @@ function [ bestThresh ] = ThresholdSelection(  trainDir, videoPath, n, s, widthO
     for t = thresh
         disp('-------------------------------------------------------------');
         disp(strcat('Testing Threshold Value: ',num2str(t)))
-        scoreImage = ImageToScoreArray( image, trainingHistograms, n, s, widthOfBins, t );
+        scoreImage = ImageToScoreArray( image, trainingHistograms, s, widthOfBins, t );
         pixels = prod(size(scoreImage)); %#ok<PSIZE>
         [L,num] = bwlabeln(scoreImage);
         max = 0;

@@ -22,9 +22,8 @@ function [] = Main2( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh,
     vidOut = VideoWriter(vidOutputName);
     vidOut.FrameRate = video.FrameRate;
     
-    batchSize = 20;
+    batchSize = 15;
     divider = floor(video.NumberOfFrames / batchSize);
-    
     %framesToSee = floor(video.NumberOfFrames / divider);
     %display(framesToSee);
     open(vidOut);
@@ -32,9 +31,6 @@ function [] = Main2( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh,
         start = (q - 1) * batchSize;
         
         vidAll = zeros(video.Height, video.Width, 3, batchSize);
-        %for i =1:framesToSee
-         %   vidAll(:,:,:,i) = read(video,i);
-        %end
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video batch:', num2str(q)));
         for i =1:batchSize
             vidAll(:,:,:,i) = read(video,i+ start);
