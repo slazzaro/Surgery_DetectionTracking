@@ -32,26 +32,23 @@ for q = 1:divider
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video batch:', num2str(q)));
     for i =1:batchSize
         vidAll(:,:,:,i) = read(video,i+ startI);
-    end
-     
-    if (shouldCallDetector == 1)
-        shouldCallDetector = 0;
-        T = timer('TimerFcn',@DetectObjectsInBackground, 'StopFcn', @UpdateShouldDetect, 'ErrorFcn', @ErrorFunc);
-        start(T);
-    end
-    
-    for c = 1:size(circles,1);
-        if (circles(c,1) ~= 0)
-            vidAll = AddCircleToVideo( vidAll, meanx, meany, radius, [0 0 0] );
+        for c = 1:size(circles,1);
+            if (circles(c,1) ~= 0)
+                vidAll(:,:,:,i) = AddCircleToVideo( vidAll, meanx, meany, radius, [0 0 0] );
+            end
         end
+        step(hVideoOut, uint8(vidAll(:,:,:,i)));
     end
     
-    for i =1:batchSize
-        % Display original video
-        %step(hVideoIn, uint8(out(:,:,:,i)));
-        
-        % Display video with detection
-        step(hVideoOut, uint8(vidAll(:,:,:,i)));
+    if (shouldCallDetector == 1)
+        %must make copy so that when vidAll is edited in next loop
+        %iteration timer function doesn't use that edited potentially
+        %incomplete vidAll
+        vidAllCopy = vidAll;
+        shouldCallDetector = 0;
+        T = timer('TimerFcn',@(~,~)DetectObjectsInBackground, ...
+            'StopFcn', @(~,~)UpdateShouldDetect, 'ErrorFcn', @(~,~)ErrorFunc);
+        start(T);
     end
     
     %writeVideo(vidOut, out);
@@ -67,24 +64,26 @@ end
 %    mkdir(outDir);
 %    display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Data directory created at : ',outDir));
 
-    function DetectObjectsInBackground()
+    function DetectObjectsInBackground
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Fired'));
-        componentVideo = VideoToScoreVideoSkip( double(vidAll), trainingHistograms, s, widthOfBins, thresh, skip);
-        %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Analyzing components...'));
+        componentVideo = VideoToScoreVideoSkip( double(vidAllCopy), trainingHistograms, s, widthOfBins, thresh, skip);
         componentVideo = ScoreVideoToComponentVideo( componentVideo );
-        [meanx, meany, radius] = uint8(GetCircleInfo(componentVideo,s));
-        circles(1,1) = meanx;
-        circles(1,2) = meany;
-        circles(1,3) = radius;
+        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Will Look For Mean and Radius'));
+        [meanxNew, meanyNew, radiusNew] = uint8(GetCircleInfo(componentVideo,s));
+        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Found Mean and Radius'));
+        circles(1,1) = meanxNew;
+        circles(1,2) = meanyNew;
+        circles(1,3) = radiusNew;
+        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Detection'));
     end
 
-    function ErrorFunc()
+    function ErrorFunc
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Error'));
     end
 
-    function UpdateShouldDetect()
+    function UpdateShouldDetect
         shouldCallDetector = 1;
-        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished'));
+        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Stop Function'));
     end
 
 end
