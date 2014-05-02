@@ -1,10 +1,12 @@
-function [ ] = ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjsToDetect )
+function [ ] = ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjsToDetect, vidOutputName )
 % Processes the video passed in looking to
 % classify the objects described in the trainingHistograms
 
 %create video to be outputed
-%vidOut = VideoWriter(strcat('../grayvid_window', num2str(windowSize),'_binwidth', num2str(widthOfBins)));
-%vidOut.FrameRate = vidObj.FrameRate;
+vidOutputName = strcat(vidOutputName,'realtime_s',num2str(s),'_binwidth', ...
+    num2str(widthOfBins),'_thresh',num2str(abs(thresh)),'_skip',num2str(skip));
+vidOut = VideoWriter(vidOutputName);
+vidOut.FrameRate = video.FrameRate;
 
 %TODO: insertText function matlab
 
@@ -23,7 +25,7 @@ circles = zeros(numObjsToDetect,3);
 shouldCallDetector = 1;
 %global T;
 
-%open(vidOut);
+open(vidOut);
 for q = 1:divider
     startI = (q - 1) * batchSize;
     
@@ -34,10 +36,12 @@ for q = 1:divider
         vidAll(:,:,:,i) = read(video,i+ startI);
         for c = 1:size(circles,1);
             if (circles(c,1) ~= 0)
-                vidAll(:,:,:,i) = AddCircleToVideo( vidAll, meanx, meany, radius, [0 0 0] );
+                display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Adding Circle:', num2str(q)));
+                vidAll(:,:,:,i) = AddCircleToVideo( vidAll, circles(c,1), circles(c,2), circles(c,3) );
             end
         end
         step(hVideoOut, uint8(vidAll(:,:,:,i)));
+        %writeVideo(vidOut, uint8(vidAll(:,:,:,i)));
     end
     
     if (shouldCallDetector == 1)
@@ -51,14 +55,12 @@ for q = 1:divider
         start(T);
     end
     
-    %writeVideo(vidOut, out);
-    
     clear vidAll;
     clear out;
     clear componentVideo;
 end
 
-%close(vidOut);
+close(vidOut);
 
 %    outDir=strcat(trainDir,'/videoUpdated');
 %    mkdir(outDir);
@@ -69,11 +71,12 @@ end
         componentVideo = VideoToScoreVideoSkip( double(vidAllCopy), trainingHistograms, s, widthOfBins, thresh, skip);
         componentVideo = ScoreVideoToComponentVideo( componentVideo );
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Will Look For Mean and Radius'));
-        [meanxNew, meanyNew, radiusNew] = uint8(GetCircleInfo(componentVideo,s));
-        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Found Mean and Radius'));
+        %[meanxNew, meanyNew, radiusNew] = uint8(GetCircleInfo(componentVideo,s));
+        [meanxNew, meanyNew, radiusNew] = GetCircleInfo(componentVideo,s);
         circles(1,1) = meanxNew;
         circles(1,2) = meanyNew;
         circles(1,3) = radiusNew;
+        display(circles);
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Detection'));
     end
 
