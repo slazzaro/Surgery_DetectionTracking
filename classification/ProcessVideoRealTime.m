@@ -3,15 +3,14 @@ function [ ] = ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, 
 % classify the objects described in the trainingHistograms
 
 %create video to be outputed
-vidOutputName = strcat(vidOutputName,'realtime_s',num2str(s),'_binwidth', ...
-    num2str(widthOfBins),'_thresh',num2str(abs(thresh)),'_skip',num2str(skip));
-vidOut = VideoWriter(vidOutputName);
-vidOut.FrameRate = video.FrameRate;
+% vidOutputName = strcat(vidOutputName,'realtime_s',num2str(s),'_binwidth', ...
+%     num2str(widthOfBins),'_thresh',num2str(abs(thresh)),'_skip',num2str(skip));
+% vidOut = VideoWriter(vidOutputName);
+% vidOut.FrameRate = video.FrameRate;
 
-hVideoIn = vision.VideoPlayer;
-hVideoIn.Name  = 'Original Video';
 hVideoOut = vision.VideoPlayer;
 hVideoOut.Name  = 'Recognition Video';
+hVideoOut.Position = [200 200 1300 800];
 
 trackingThreshold = 0.05 * (video.Width * video.Height);
 zerosInARow = 0;
@@ -27,18 +26,18 @@ circles = zeros(numObjsToDetect,3);
 shouldCallDetector = 1;
 %global T;
 
-open(vidOut);
+%open(vidOut);
 for q = 1:divider
     startI = (q - 1) * batchSize;
     
     vidAll = zeros(video.Height, video.Width, 3, batchSize);
     
-    display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video batch:', num2str(q)));
+    %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video batch:', num2str(q)));
     for i =1:batchSize
         vidAll(:,:,:,i) = read(video,i+ startI);
         for c = 1:size(circles,1);
             if (circles(c,1) ~= 0)
-                display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Adding Circle:', num2str(q)));
+                %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Adding Circle:', num2str(q)));
                 %display(circles);
                 vidAll(:,:,:,i) = AddCircleToImage( vidAll(:,:,:,i), circles(c,1), circles(c,2), circles(c,3), [0 0 0] );
                 vidAll(:,:,:,i) = insertText(vidAll(:,:,:,i), ...
@@ -46,8 +45,8 @@ for q = 1:divider
                     'TextColor', 'black', 'AnchorPoint', 'Center');
             end
         end
-        %step(hVideoOut, uint8(vidAll(:,:,:,i)));
-        writeVideo(vidOut, uint8(vidAll(:,:,:,i)));
+        step(hVideoOut, uint8(vidAll(:,:,:,i)));
+        %writeVideo(vidOut, uint8(vidAll(:,:,:,i)));
     end
     
     if (shouldCallDetector == 1)
@@ -66,17 +65,17 @@ for q = 1:divider
     clear componentVideo;
 end
 
-close(vidOut);
+%close(vidOut);
 
 %    outDir=strcat(trainDir,'/videoUpdated');
 %    mkdir(outDir);
 %    display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Data directory created at : ',outDir));
 
     function DetectObjectsInBackground
-        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Fired'));
+        %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Fired'));
         componentVideo = VideoToScoreVideoSkip( double(vidAllCopy), trainingHistograms, s, widthOfBins, thresh, skip);
         [componentVideo, num] = ScoreVideoToComponentVideo( componentVideo );
-        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Will Look For Mean and Radius'));
+        %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Will Look For Mean and Radius'));
         if (num ~= 0)
             [meanxNew, meanyNew, radiusNew] = GetCircleInfo(componentVideo,s);
             if (circles(1,1) ~= 0)
@@ -109,7 +108,7 @@ close(vidOut);
                     circles(1,3) = radiusNew;
                 end
             end
-            display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Detection'));
+            %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Detection'));
         else
             zerosInARow = zerosInARow + 1;
             realValsInARow = 0;
@@ -127,7 +126,7 @@ close(vidOut);
 
     function UpdateShouldDetect
         shouldCallDetector = 1;
-        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Stop Function'));
+        %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Stop Function'));
     end
 
 end

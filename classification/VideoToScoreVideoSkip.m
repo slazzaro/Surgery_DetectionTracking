@@ -10,7 +10,7 @@ W = width/s;
 out = false(H,W,frames);
 
 for i = 1:ceil(frames/skip)
-    display(strcat('frame number: ',num2str((i-1)*skip+1)));
+    %display(strcat('frame number: ',num2str((i-1)*skip+1)));
     out(:,:,(i-1)*skip+1) = ImageToScoreArray(video(:,:,:,(i-1)*skip+1), train, s, w, thresh);
     for j = (i-1)*skip+2:min(i*skip, frames)
         out(:,:,j) = out(:,:,(i-1)*skip+1);

@@ -3,11 +3,8 @@ function [] = MainRealTime( trainDir, videoPath, vidOutputName, s, widthOfBins, 
 % path to video.  First reads in the training images
 % (which are one directory below trainDir) and puts
 % them in a 256/w x 3 x numTrainingImages matrix.  Then
-% calls the ProcessVideo function to process the video
+% calls the ProcessVideoRealTime function to process the video
 % and try to classify objects in the video
-
-%MAIN2 includes outlines of the object or grids on the object controlled
-%inside OutlineRegion.m (look for the commented line)
     
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing training images...'));
     [trainingHistograms, folderNames] = BuildTrainingHistograms(trainDir, widthOfBins);
@@ -19,5 +16,15 @@ function [] = MainRealTime( trainDir, videoPath, vidOutputName, s, widthOfBins, 
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing video...'));
     numObjectsToDetect = 1;
     ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjectsToDetect, vidOutputName, folderNames );
+
+% %code to test speed of video playing without processing
+%     hVideoOut = vision.VideoPlayer;
+%     hVideoOut.Name  = 'Original Video';
+%     hVideoOut.Position = [200 200 1300 800];
+%     video = VideoReader(videoPath);
+%     for i = 1:video.NumberOfFrames
+%         frame = read(video, i);
+%         step(hVideoOut, frame);
+%     end
     
 end
