@@ -69,14 +69,15 @@ close(vidOut);
     function DetectObjectsInBackground
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Fired'));
         componentVideo = VideoToScoreVideoSkip( double(vidAllCopy), trainingHistograms, s, widthOfBins, thresh, skip);
-        [componentVideo, num] = ScoreVideoToComponentVideo( componentVideo );
+        display(componentVideo);
+        componentVideo = ScoreVideoToComponentVideo( componentVideo );
+        display(componentVideo);
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Will Look For Mean and Radius'));
-        if (num ~= 0)
-           [meanxNew, meanyNew, radiusNew] = GetCircleInfo(componentVideo,s);
-            circles(1,1) = meanxNew;
-            circles(1,2) = meanyNew;
-            circles(1,3) = radiusNew; 
-        end
+        %[meanxNew, meanyNew, radiusNew] = uint8(GetCircleInfo(componentVideo,s));
+        [meanxNew, meanyNew, radiusNew] = GetCircleInfo(componentVideo,s);
+        circles(1,1) = meanxNew;
+        circles(1,2) = meanyNew;
+        circles(1,3) = radiusNew;
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Detection'));
     end
 

@@ -10,7 +10,7 @@ function [] = MainRealTime( trainDir, videoPath, vidOutputName, s, widthOfBins, 
 %inside OutlineRegion.m (look for the commented line)
     
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing training images...'));
-    trainingHistograms = BuildTrainingHistograms(trainDir, widthOfBins);
+    [trainingHistograms, folderNames] = BuildTrainingHistograms(trainDir, widthOfBins);
     
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video...'));
     video = VideoReader(videoPath);
@@ -18,6 +18,6 @@ function [] = MainRealTime( trainDir, videoPath, vidOutputName, s, widthOfBins, 
     %TO PROCESS AND SHOW LIVE...HAS INTERFACE FOR TRACKING TO BE ADDED
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing video...'));
     numObjectsToDetect = 1;
-    ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjectsToDetect, vidOutputName );
+    ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjectsToDetect, vidOutputName, folderNames );
     
 end

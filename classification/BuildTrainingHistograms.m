@@ -1,4 +1,4 @@
-function [ trainingHistograms ] = BuildTrainingHistograms( trainDir, w )
+function [ trainingHistograms, folderNames ] = BuildTrainingHistograms( trainDir, w )
 
 	widthOfBins = w;
     

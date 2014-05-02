@@ -13,7 +13,7 @@ function [] = Main2( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh,
     num2str(widthOfBins),'_thresh',num2str(abs(thresh)),'_skip',num2str(skip));
 
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing training images...'));
-    trainingHistograms = BuildTrainingHistograms(trainDir, widthOfBins);
+    [trainingHistograms, folderNames] = BuildTrainingHistograms(trainDir, widthOfBins);
     
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video...'));
     video = VideoReader(videoPath);
@@ -43,7 +43,7 @@ function [] = Main2( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh,
         componentVideo = VideoToScoreVideoSkip( double(vidAll), trainingHistograms, s, widthOfBins, thresh, skip);
         
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Analyzing components...'));
-        componentVideo = ScoreVideoToComponentVideo( componentVideo );
+        [componentVideo, num] = ScoreVideoToComponentVideo( componentVideo );
         out = uint8(ComponentVideoToCircleVideo(vidAll,componentVideo,s));
         %out = uint8(OutlineVideoComponent(double(vidAll),componentVideo));
         %implay(out);

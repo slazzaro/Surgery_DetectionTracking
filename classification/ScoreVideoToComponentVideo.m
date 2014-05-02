@@ -1,4 +1,4 @@
-function [ out ] = ScoreVideoToComponentVideo( scoreVideo )
+function [ out, component ] = ScoreVideoToComponentVideo( scoreVideo )
 %UNTITLED12 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -12,7 +12,11 @@ for i = 1:num
         max = temp;
     end
 end
-out = (L==component);
+if component == 0
+    out = scoreVideo;
+else
+    out = (L==component);
+end
 
 end
 
