@@ -13,6 +13,10 @@ hVideoIn.Name  = 'Original Video';
 hVideoOut = vision.VideoPlayer;
 hVideoOut.Name  = 'Recognition Video';
 
+trackingThreshold = 0.05 * (video.Width * video.Height);
+zerosInARow = 0;
+realValsInARow = 0;
+
 batchSize = 10;
 divider = floor(video.NumberOfFrames / batchSize);
 
@@ -35,13 +39,15 @@ for q = 1:divider
         for c = 1:size(circles,1);
             if (circles(c,1) ~= 0)
                 display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Adding Circle:', num2str(q)));
-                display(circles);
+                %display(circles);
                 vidAll(:,:,:,i) = AddCircleToImage( vidAll(:,:,:,i), circles(c,1), circles(c,2), circles(c,3), [0 0 0] );
-                vidAll(:,:,:,i) = insertText(vidAll(:,:,:,i), [circles(c,1), circles(c,2)], folderNames(1), 'TextColor', 'black', 'AnchorPoint', 'Center');
+                vidAll(:,:,:,i) = insertText(vidAll(:,:,:,i), ...
+                    [circles(c,1), circles(c,2)], folderNames(1), ...
+                    'TextColor', 'black', 'AnchorPoint', 'Center');
             end
         end
-        step(hVideoOut, uint8(vidAll(:,:,:,i)));
-        %writeVideo(vidOut, uint8(vidAll(:,:,:,i)));
+        %step(hVideoOut, uint8(vidAll(:,:,:,i)));
+        writeVideo(vidOut, uint8(vidAll(:,:,:,i)));
     end
     
     if (shouldCallDetector == 1)
@@ -72,12 +78,47 @@ close(vidOut);
         [componentVideo, num] = ScoreVideoToComponentVideo( componentVideo );
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Will Look For Mean and Radius'));
         if (num ~= 0)
-           [meanxNew, meanyNew, radiusNew] = GetCircleInfo(componentVideo,s);
-            circles(1,1) = meanxNew;
-            circles(1,2) = meanyNew;
-            circles(1,3) = radiusNew; 
+            [meanxNew, meanyNew, radiusNew] = GetCircleInfo(componentVideo,s);
+            if (circles(1,1) ~= 0)
+                if (meanxNew == 0)
+                    zerosInARow = zerosInARow + 1;
+                    realValsInARow = 0;
+                end
+                if (zerosInARow >= 2) %if 2 zeros in a row, then conclude it's off screen
+                    circles(1,1) = meanxNew;
+                    circles(1,2) = meanyNew;
+                    circles(1,3) = radiusNew;
+                else
+                    %To make sure noise wasn't captured only take small changes in
+                    %obj position
+                    if ( norm(circles(1,1:2) - [meanxNew, meanyNew] ) ^2 < trackingThreshold )
+                        circles(1,1) = meanxNew;
+                        circles(1,2) = meanyNew;
+                        circles(1,3) = radiusNew;
+                        zerosInARow = 0;
+                    end
+                end
+            else
+                %if object hasn't yet been detected, then set it to new
+                %detection as long as been detected twice in a row
+                realValsInARow = realValsInARow + 1;
+                zerosInARow = 0;
+                if (realValsInARow >= 3)
+                    circles(1,1) = meanxNew;
+                    circles(1,2) = meanyNew;
+                    circles(1,3) = radiusNew;
+                end
+            end
+            display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Detection'));
+        else
+            zerosInARow = zerosInARow + 1;
+            realValsInARow = 0;
+            if (zerosInARow >= 2) %if 2 zeros in a row, then conclude it's off screen
+                circles(1,1) = 0;
+                circles(1,2) = 0;
+                circles(1,3) = 0;
+            end
         end
-        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Timer Finished Detection'));
     end
 
     function ErrorFunc
@@ -90,4 +131,3 @@ close(vidOut);
     end
 
 end
-

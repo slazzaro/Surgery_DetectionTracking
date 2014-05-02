@@ -44,7 +44,11 @@ function [] = Main2( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh,
         
         display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Analyzing components...'));
         [componentVideo, num] = ScoreVideoToComponentVideo( componentVideo );
-        out = uint8(ComponentVideoToCircleVideo(vidAll,componentVideo,s));
+        if (num ~= 0) 
+            out = uint8(ComponentVideoToCircleVideo(vidAll,componentVideo,s));
+        else
+            out = vidAll;
+        end
         %out = uint8(OutlineVideoComponent(double(vidAll),componentVideo));
         %implay(out);
         
