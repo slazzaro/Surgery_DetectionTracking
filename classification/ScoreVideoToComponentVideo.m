@@ -19,8 +19,8 @@ if component == 0
 else
     %check if a good portion of biggest component is classified correcty.
     %If not then don't show it on screen
-    %Good values are 0.008, 0.0075, 0.007
-    percentage = 0.0068 * ( size(scoreVideo,1) * size(scoreVideo,2) * size(scoreVideo,3) );
+    %Good values are 0.007, .006, .005, .004, .003
+    percentage = 0.006 * ( size(scoreVideo,1) * size(scoreVideo,2) * size(scoreVideo,3) );
     display(max);
     display(percentage);
     if (max < percentage)

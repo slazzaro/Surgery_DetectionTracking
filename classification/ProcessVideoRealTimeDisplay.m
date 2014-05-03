@@ -1,25 +1,24 @@
-function [ ] = ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjsToDetect, vidOutputName, folderNames )
+function [ ] = ProcessVideoRealTimeDisplay( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjsToDetect, vidOutputName, folderNames )
 % Processes the video passed in looking to
 % classify the objects described in the trainingHistograms
 
 %create video to be outputed
-skip = round(floor(video.FrameRate) / 2);
-vidOutputName = strcat(vidOutputName,'realtime_s',num2str(s),'_binwidth', ...
-    num2str(widthOfBins),'_thresh',num2str(abs(thresh)),'_skip',num2str(skip));
-vidOut = VideoWriter(vidOutputName);
-vidOut.FrameRate = video.FrameRate;
+% vidOutputName = strcat(vidOutputName,'realtime_s',num2str(s),'_binwidth', ...
+%     num2str(widthOfBins),'_thresh',num2str(abs(thresh)),'_skip',num2str(skip));
+% vidOut = VideoWriter(vidOutputName);
+% vidOut.FrameRate = video.FrameRate;
 
 hVideoOut = vision.VideoPlayer;
 hVideoOut.Name  = 'Recognition Video';
 hVideoOut.Position = [200 200 1300 800];
 
-%good trackingThresh values: 400...increase the decimal to allow bigger
+%good trackingThresh values: 0.05...increase the decimal to allow bigger
 %movement changes from frame to frame
-trackingThreshold = 300;
+trackingThreshold = 0.02 * (video.Width * video.Height);
 zerosInARow = 0;
 realValsInARow = 0;
 
-batchSize = floor(video.FrameRate);
+batchSize = 10;
 divider = floor(video.NumberOfFrames / batchSize);
 
 %object which will keep track of the current circles on screen.  First
@@ -31,7 +30,7 @@ shouldCallDetector = 1;
 
 vidAll = zeros(video.Height, video.Width, 3, batchSize);
 
-open(vidOut);
+%open(vidOut);
 for q = 1:divider
     startI = (q - 1) * batchSize;
     
@@ -40,15 +39,16 @@ for q = 1:divider
         vidAll(:,:,:,i) = read(video,i+ startI);
         for c = 1:size(circles,1);
             if (circles(c,1) ~= 0)
-                display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Adding Circle And Label:', num2str(q)));
-                vidAll(:,:,:,i) = insertShape(vidAll(:,:,:,i), 'Circle', [circles(c,1) circles(c,2) circles(c,3)], 'Color', 'black');
+                display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Adding Circle:', num2str(q)));
+                %display(circles);
+                vidAll(:,:,:,i) = AddCircleToImage( vidAll(:,:,:,i), circles(c,1), circles(c,2), circles(c,3), [0 0 0] );
                 vidAll(:,:,:,i) = insertText(vidAll(:,:,:,i), ...
                     [circles(c,1), circles(c,2)], folderNames(1), ...
-                    'TextColor', 'black', 'AnchorPoint', 'Center', 'BoxOpacity', 1);
+                    'TextColor', 'black', 'AnchorPoint', 'Center');
             end
         end
-        %step(hVideoOut, uint8(vidAll(:,:,:,i)));
-        writeVideo(vidOut, uint8(vidAll(:,:,:,i)));
+        step(hVideoOut, uint8(vidAll(:,:,:,i)));
+        %writeVideo(vidOut, uint8(vidAll(:,:,:,i)));
     end
     
     if (shouldCallDetector == 1)
@@ -67,7 +67,7 @@ for q = 1:divider
     clear componentVideo;
 end
 
-close(vidOut);
+%close(vidOut);
 
 %    outDir=strcat(trainDir,'/videoUpdated');
 %    mkdir(outDir);
@@ -92,9 +92,7 @@ close(vidOut);
                 else
                     %To make sure noise wasn't captured only take small changes in
                     %obj position
-                    display(norm(circles(1,1:2) - [meanxNew, meanyNew] ) ^ 2);
-                    display(trackingThreshold);
-                    if ( norm(circles(1,1:2) - [meanxNew, meanyNew] ) ^ 2 < trackingThreshold )
+                    if ( norm(circles(1,1:2) - [meanxNew, meanyNew] ) ^2 < trackingThreshold )
                         circles(1,1) = meanxNew;
                         circles(1,2) = meanyNew;
                         circles(1,3) = radiusNew;

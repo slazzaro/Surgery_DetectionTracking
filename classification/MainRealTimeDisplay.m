@@ -1,4 +1,4 @@
-function [] = MainRealTime( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh, skip )
+function [] = MainRealTimeDisplay( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh, skip )
 % Takes in a directory path to training images and
 % path to video.  First reads in the training images
 % (which are one directory below trainDir) and puts
@@ -15,29 +15,16 @@ function [] = MainRealTime( trainDir, videoPath, vidOutputName, s, widthOfBins, 
     %TO PROCESS AND SHOW LIVE...HAS INTERFACE FOR TRACKING TO BE ADDED
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing video...'));
     numObjectsToDetect = 1;
-    tic
-    ProcessVideoRealTime( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjectsToDetect, vidOutputName, folderNames );
-    toc
-
+    ProcessVideoRealTimeDisplay( video, trainingHistograms, s, widthOfBins, thresh, skip, numObjectsToDetect, vidOutputName, folderNames );
 
 % %code to test speed of video playing without processing
-%     tic
-%     vidOutputName = strcat(vidOutputName,'realtime_s',num2str(s),'_binwidth', ...
-%     num2str(widthOfBins),'_thresh',num2str(abs(thresh)),'_skip',num2str(skip));
-%     vidOut = VideoWriter(vidOutputName);
-%     vidOut.FrameRate = video.FrameRate;
-%     
 %     hVideoOut = vision.VideoPlayer;
 %     hVideoOut.Name  = 'Original Video';
 %     hVideoOut.Position = [200 200 1300 800];
 %     video = VideoReader(videoPath);
-%     open(vidOut);
 %     for i = 1:video.NumberOfFrames
 %         frame = read(video, i);
-%         %step(hVideoOut, frame);
-%         writeVideo(vidOut, frame);
+%         step(hVideoOut, frame);
 %     end
-%     close(vidOut);
-%     toc
     
 end
