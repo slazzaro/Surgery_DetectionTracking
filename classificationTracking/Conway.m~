@@ -1,11 +1,6 @@
 function [ out ] = Conway( scores )
-%  Conway - Use simple form of Conway's game of life on score bitmap
-%--------------------------------------------------------------------------
-%   Params: scores - the score bitmap
-%
-%   Returns: out - the score bitmap after a simple Conway iteration
-%
-%--------------------------------------------------------------------------
+%UNTITLED2 Summary of this function goes here
+%   Detailed explanation goes here
 out = scores;
 for i = 2:length(scores(:,1))-1
     for j = 2:length(scores(1,:))-1

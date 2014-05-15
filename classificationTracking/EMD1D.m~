@@ -1,5 +1,5 @@
 function [ out ] = EMD1D( u, v )
-%  EMD1D - Compute Earthmover's distance between histogram u and v
+%  Score1D - Compute Earthmover's distance between histogram u and v
 %--------------------------------------------------------------------------
 %   Params: u - histogram 1
 %           v - histogram 2

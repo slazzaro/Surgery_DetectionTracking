@@ -1,5 +1,5 @@
 function [ out ] = Distance1D( hist1, hist2 )
-%  Distance1D - Compute Distance between two RGB histograms by computing EMD distance for each color
+%  Score1D - Compute Distance between two RGB histograms by computing EMD distance for each color
 %--------------------------------------------------------------------------
 %   Params: hist1 - histogram 1
 %           hist2 - histogram 2

@@ -1,8 +1,23 @@
 function [ bestThresh ] = ThresholdSelection(  trainDir, image, s, widthOfBins, thresh, p)
-%This function is used for selecting the optimal threshold by comparing the
-%fraction of the non-thresholded content which lies in the principal
+% ThresholdSelection - This function is used for selecting the optimal 
+% threshold by comparing the
+% fraction of the non-thresholded content which lies in the principal
 % component.  The variable "p" should represent the fraction of the image
 % inputed that contains the desired object... example: p=0.04.
+%--------------------------------------------------------------------------
+%   Params: trainDir - directory of training images.  Note there should be
+%               a subdirectory in trainDir which contains .jpg images
+%           s - the window size that each frame will be split up in to form
+%               histograms
+%           widthOfBins - the width of the bins for the RGB color
+%               histograms
+%           thresh - the cutoff distance threshold used to measure whether
+%               or not window histograms are close enough to the training
+%               histograms.
+%           p - proportion of pixels containing object of interest
+%
+%   Returns: bestThresh - a guess for threshold value to choose
+%--------------------------------------------------------------------------
 
     display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Processing training images...'));
     trainingHistograms = BuildTrainingHistograms(trainDir, widthOfBins);

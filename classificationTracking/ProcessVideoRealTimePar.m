@@ -53,7 +53,7 @@ fBeenCalled = 0;
 open(vidOut);
 tic
 for q = 1:video.NumberOfFrames
-   % display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video batch:', num2str(q)));
+   display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video batch:', num2str(q)));
     
     rgbCurr = read(video,q);
     if (fBeenCalled == 1)

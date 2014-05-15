@@ -1,6 +1,15 @@
 function [ meanx, meany, radius ] = BinaryVidToCircle( binary, s )
-%[ meanx, meany, radius ] = BinaryToCircle( binary, s )
-%   Detailed explanation goes here
+%  BinaryVidToCircle - Find meanx, meany, and radius of binary image/video
+%--------------------------------------------------------------------------
+%   Params: binary - binary image or video
+%           s - the window size that each frame will be split up in to form
+%               histograms
+%
+%   Returns: meanx - mean x point of circle
+%            meany - mean y point of circle
+%            radius - radius of circle
+%
+%--------------------------------------------------------------------------
 
 count=0;
 meanx=0;

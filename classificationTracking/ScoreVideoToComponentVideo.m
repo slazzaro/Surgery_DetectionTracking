@@ -1,6 +1,13 @@
 function [ out, component ] = ScoreVideoToComponentVideo( scoreVideo )
-%UNTITLED12 Summary of this function goes here
-%   Detailed explanation goes here
+%  ScoreVideoToComponentVideo - use component analysis to only retain
+%  largest component
+%--------------------------------------------------------------------------
+%   Params: scoreVideo - the score video
+%
+%   Returns: out - component video only containing biggest component
+%            component - number for max component or 0 if no component was
+%            large enough
+%--------------------------------------------------------------------------
 
 out = 0;
 [L,num] = bwlabeln(scoreVideo);

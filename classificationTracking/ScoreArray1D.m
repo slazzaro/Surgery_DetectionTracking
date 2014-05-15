@@ -1,6 +1,14 @@
 function [ out ] = ScoreArray1D( histArray, train, thresh )
-%  Compute score for histogram given training set by computing EMD distance
+%  Score1D - Compute score for histogram given training set by computing EMD distance
 %  to each image histogram and inversely weighting distance.
+%--------------------------------------------------------------------------
+%   Params: hist - histogram to compare to training histograms
+%           train - training histograms
+%           thresh - the distance threshold cutoff
+%
+%   Returns: out - binary score video
+%
+%--------------------------------------------------------------------------
 height = length(histArray(1,1,:,1));
 width = length(histArray(1,1,1,:));
 out = false(height,width);
