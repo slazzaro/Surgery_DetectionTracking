@@ -1,6 +1,6 @@
 README
 
-In order to run the code used, the MainRealTime function should be called.
+In order to run the code used, the MainRealTime function should be called, which is in the classificationTracking folder.  Different sets of the training images were used with the best results coming from using pulmonary3 and pulmonary4 located in the pulmonary_arteries folder.
 
 Syntax:
 MainRealTime( trainDir, videoPath, vidOutputName, s, widthOfBins, thresh );

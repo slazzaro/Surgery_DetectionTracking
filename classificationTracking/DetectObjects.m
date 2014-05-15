@@ -39,20 +39,14 @@ if (num ~= 0)
         realValsInARow = realValsInARow + 1;
         zerosInARow = 0;
         %Good vals is 8
-        if (realValsInARow >= 5)
+        if (realValsInARow >= 6)
             circles(1,1) = meanxNew;
             circles(1,2) = meanyNew;
             circles(1,3) = radiusNew;
         end
     end
 else
-    zerosInARow = zerosInARow + 1;
     realValsInARow = 0;
-    if (zerosInARow >= 4) %if 2 zeros in a row, then conclude it's off screen
-        circles(1,1) = 0;
-        circles(1,2) = 0;
-        circles(1,3) = 0;
-    end
 end
 %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Detection Finished'));
 

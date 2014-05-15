@@ -52,8 +52,8 @@ fBeenCalled = 0;
 %p = gcp();
 open(vidOut);
 tic
-for q = 1:video.NumberOfFrames
-   display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video batch:', num2str(q)));
+for q = 1:video.NumberOfFrames - 1
+   %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Reading video batch:', num2str(q)));
     
     rgbCurr = read(video,q);
     if (fBeenCalled == 1)
@@ -71,6 +71,7 @@ for q = 1:video.NumberOfFrames
                         zerosInARow = 0;
                     end
                     if (circles(c,1) ~= 0)
+                        display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Object detected at frame:', num2str(q)));
                         realValsInARow = 0;
                         zerosInARow = 0;
                         circles(c,4) = rgbCurr(circles(c,1), circles(c,2), 1);
@@ -107,7 +108,7 @@ for q = 1:video.NumberOfFrames
             %newCentroids = calcSimpleOpticalFlow(circles, rgbCurr, rgbOld, 45, 1000, 4, 0);
             % Good neighbor sizes...20,12,...good penalties 2...good
             % windowSizes 3,5...
-            [newCentroids, zerosInARow] = calcSimpleOpticalFlowHists(circles, rgbCurr, trainingHistograms, 30, 3, widthOfBins, thresh, zerosInARow);
+            [newCentroids, zerosInARow] = calcSimpleOpticalFlowHists(circles, rgbCurr, trainingHistograms, 10, 2, widthOfBins, thresh, zerosInARow);
             for x = 1:size(circles,1)
                 circles(x,1) = newCentroids(x,1);
                 circles(x,2) = newCentroids(x,2);
