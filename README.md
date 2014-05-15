@@ -1,4 +1,4 @@
 FINAL_PROJECT
 =============
 
-Computer Vision final projecy...using optical flow to track objects in surgery as well as using SIFT features to detect them
+Computer Vision final project...using RGB color histograms to first detect objects in videos of robotic surgery, and then track them using similar concepts with the neighborhood around centroid detected.
