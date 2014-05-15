@@ -1,14 +1,33 @@
 function [ ] = ProcessVideoRealTimePar( video, trainingHistograms, s, widthOfBins, thresh, numObjsToDetect, vidOutputName, folderNames )
-% Processes the video passed in looking to
-% classify the objects described in the trainingHistograms
+%  ProcessVideoRealTimePar - Processes the video passed in looking to
+% classify the objects described in the trainingHistograms.  Runs the
+% detection method in parallel to the video reading and runs the tracking
+% method only once the object is detected.  The tracking is done with each
+% subsequent frame as its extremely fast.
+%--------------------------------------------------------------------------
+%   Params: video - test video object
+%           trainingHistograms - histograms of the training images
+%           vidOutputName - the name of video file to output
+%           s - the window size that each frame will be split up in to form
+%               histograms
+%           widthOfBins - the width of the bins for the RGB color
+%               histograms
+%           thresh - the cutoff distance threshold used to measure whether
+%               or not window histograms are close enough to the training
+%               histograms.
+%           numObjsToDetect - The number of objects to detect.  Currently
+%               only supports 1 object at a time.
+%           vidOutputName - name of video to output with detection and
+%               tracking added in
+%           folderNames - name of training image folder to be used for
+%               bounding circle annotation
+%
+%--------------------------------------------------------------------------
 
 hVideoOut = vision.VideoPlayer;
 hVideoOut.Name  = 'Recognition Video';
 hVideoOut.Position = [200 200 1300 800];
 
-%good trackingThresh values: 500, 400...increase the decimal to allow bigger
-%movement changes from frame to frame
-trackingThreshold = 600;
 zerosInARow = 0;
 realValsInARow = 0;
 
@@ -39,7 +58,10 @@ for q = 1:video.NumberOfFrames
     rgbCurr = read(video,q);
     if (fBeenCalled == 1)
         for c = 1:numObjsToDetect
-            %display(f.State);
+            %if nothing has been detected, circles(c,1) will equal 0 which
+            %means that the parallel detection function must have been
+            %called.  If that function is finished executing, then fetch
+            %its values here
             if (circles(c,1) == 0)
                 if (strcmp(f.State, 'finished') == 1)
                     [ circles, zerosInARow, realValsInARow, shouldCallDetector ] = fetchOutputs(f);
@@ -59,7 +81,9 @@ for q = 1:video.NumberOfFrames
             end
         end
     end
-
+    
+    %Iterate through objects of interest and put bounding circle around
+    %them if detected / being tracked.
     for c = 1:numObjsToDetect
         if (circles(c,1) ~= 0)
             %display(strcat(datestr(now,'HH:MM:SS'),' [INFO] Adding Circle And Label:', num2str(q)));
@@ -74,6 +98,9 @@ for q = 1:video.NumberOfFrames
     %step(hVideoOut, uint8(rgbDisplay));
     writeVideo(vidOut, uint8(rgbDisplay));
     
+    %Check if the object(s) of interest has been detected.  If so, then use
+    %the tracking method talked about in the paper to find where to move
+    %centroid to
     for c = 1:numObjsToDetect
         if (circles(c,1) ~= 0)
              % Good neighbor sizes...85,...good penalties 3.6
@@ -92,11 +119,14 @@ for q = 1:video.NumberOfFrames
         end
     end
     
+    %If the object(s) of intersst has not been detected and the detection
+    %function is not being executed in parallel, then begin executing the
+    %detection function in parallel.
     if (shouldCallDetector == 1 && circles(c,1) == 0)
         shouldCallDetector = 0;
-        %f = parfeval(p, @DetectObjects, 4, vidAllCopy, trainingHistograms, s, widthOfBins, thresh, skip, circles, zerosInARow, realValsInARow, trackingThreshold);
-        %f = parfeval(@DetectObjects, 4, vidAll(:,:,:,frameToStartAt:batchSize), trainingHistograms, s, widthOfBins, thresh, skip, circles, zerosInARow, realValsInARow, trackingThreshold);
-        f = parfeval(@DetectObjects, 4, rgbCurr, trainingHistograms, s, widthOfBins, thresh, skip, circles, zerosInARow, realValsInARow, trackingThreshold);
+        %f = parfeval(p, @DetectObjects, 4, vidAllCopy, trainingHistograms, s, widthOfBins, thresh, skip, circles, zerosInARow, realValsInARow);
+        %f = parfeval(@DetectObjects, 4, vidAll(:,:,:,frameToStartAt:batchSize), trainingHistograms, s, widthOfBins, thresh, skip, circles, zerosInARow, realValsInARow);
+        f = parfeval(@DetectObjects, 4, rgbCurr, trainingHistograms, s, widthOfBins, thresh, skip, circles, zerosInARow, realValsInARow);
         fBeenCalled = 1;
     end
     

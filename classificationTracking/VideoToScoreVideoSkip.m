@@ -1,5 +1,19 @@
 function [ out ] = VideoToScoreVideoSkip( video, train, s, w, thresh, skip)
-% video should be a height X width X 3 X frames --- array
+%  VideoToScoreVideoSkip - get component video of video/frame passed in
+%--------------------------------------------------------------------------
+%   Params: video - should be a height X width X 3 X frames --- array
+%           train - histograms of the training images
+%           s - the window size that each frame will be split up in to form
+%               histograms
+%           w - the width of the bins for the RGB color
+%               histograms
+%           thresh - the cutoff distance threshold used to measure whether
+%               or not window histograms are close enough to the training
+%               histograms.
+%           skip - The frames to skip if vidAllCopy is a video entered
+%
+%   Returns: out - component video
+%--------------------------------------------------------------------------
 
 
 height = length(video(:,1,1,1));

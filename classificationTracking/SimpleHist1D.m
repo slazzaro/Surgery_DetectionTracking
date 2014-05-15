@@ -1,6 +1,12 @@
 function [ out ] = SimpleHist1D( image, w )
-%UNTITLED5 Summary of this function goes here
-%   Detailed explanation goes here
+%  SimpleHist1D - Builds RGB histogram for image in with bin size w.
+%--------------------------------------------------------------------------
+%   Params: image - image to have color histogram built
+%           w - the width of the bins for the RGB color
+%               histograms
+%
+%   Returns: out - histogram represented by 256 / w x 3 matrix
+%--------------------------------------------------------------------------
 image = double(image);
 n = length(image(1,:,1));
 m = length(image(:,1,1));

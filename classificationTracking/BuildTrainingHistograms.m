@@ -1,4 +1,20 @@
 function [ trainingHistograms, folderNames ] = BuildTrainingHistograms( trainDir, w )
+%  BuildTrainingHistograms - Reads in training images from trainDir and 
+%  builds RGB histograms for training images in with bin size w.
+%--------------------------------------------------------------------------
+%   Params: trainDir - directory of training images.  Note there should be
+%               a subdirectory in trainDir which contains .jpg images
+%           w - the width of the bins for the RGB color
+%               histograms
+%
+%   Returns: trainingHistograms - the histograms for the training images in
+%                         a 256/w x 3 x numTrainingImages matrix
+%            folderNames - name of folder holding training images which
+%            should be the name of the object of interest as this will be
+%            used in the bounding circle to label the object
+%
+%--------------------------------------------------------------------------
+
 
 	widthOfBins = w;
     
