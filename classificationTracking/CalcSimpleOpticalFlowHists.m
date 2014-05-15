@@ -1,4 +1,4 @@
-function [ newPositions, zerosInARow ] = calcSimpleOpticalFlowHists( centroids, img1, train, neighborSize, windowSize, w, thresh, zerosInARow)
+function [ newPositions, zerosInARow ] = CalcSimpleOpticalFlowHists( centroids, img1, train, neighborSize, windowSize, w, thresh, zerosInARow)
 %  calcSimpleOpticalFlowHists - Used to track object of interest
 %--------------------------------------------------------------------------
 %   Params: centroids: n x 3 matrix where n is the number of centroids showing
@@ -60,7 +60,7 @@ for i = 1:size(centroids,1)
     end
     if (newPositions(i,1) == 0)
         zerosInARow = zerosInARow + 1;
-        if (zerosInARow <= 10)
+        if (zerosInARow <= 15)
             newPositions(i,1) = centroids(i,1);
             newPositions(i,2) = centroids(i,2);
         end

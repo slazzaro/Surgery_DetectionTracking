@@ -108,7 +108,7 @@ for q = 1:video.NumberOfFrames - 1
             %newCentroids = calcSimpleOpticalFlow(circles, rgbCurr, rgbOld, 45, 1000, 4, 0);
             % Good neighbor sizes...20,12,...good penalties 2...good
             % windowSizes 3,5...
-            [newCentroids, zerosInARow] = calcSimpleOpticalFlowHists(circles, rgbCurr, trainingHistograms, 10, 2, widthOfBins, thresh, zerosInARow);
+            [newCentroids, zerosInARow] = CalcSimpleOpticalFlowHists(circles, rgbCurr, trainingHistograms, 10, 2, widthOfBins, thresh, zerosInARow);
             for x = 1:size(circles,1)
                 circles(x,1) = newCentroids(x,1);
                 circles(x,2) = newCentroids(x,2);
