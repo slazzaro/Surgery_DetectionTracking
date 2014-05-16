@@ -19,8 +19,8 @@ function [ out ] = VideoToScoreVideoSkip( video, train, s, w, thresh, skip)
 height = length(video(:,1,1,1));
 width = length(video(1,:,1,1));
 frames = length(video(1,1,1,:));
-H = height/s;
-W = width/s;
+H = floor(height/s);
+W = floor(width/s);
 out = false(H,W,frames);
 
 for i = 1:ceil(frames/skip)

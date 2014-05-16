@@ -13,8 +13,8 @@ function [ out ] = Histograms1D( image, s, w )
 %--------------------------------------------------------------------------
 height = length(image(:,1,1));
 width = length(image(1,:,1));
-discHeight = height/s;
-discWidth = width/s;
+discHeight = floor(height/s);
+discWidth = floor(width/s);
 out = zeros(256/w,3,discHeight,discWidth);
 
 for i=1:discHeight
